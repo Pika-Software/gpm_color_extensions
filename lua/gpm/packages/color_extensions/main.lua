@@ -59,7 +59,7 @@ do
                 return LerpColor( frac, a, b )
             end
 
-            return lerpFunc
+            return lerpFunc( frac, a, b )
         end
     end
 end
