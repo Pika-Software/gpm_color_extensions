@@ -59,13 +59,13 @@ do
                 return LerpColor( frac, a, b )
             end
 
-            return lerpFunc
+            return lerpFunc( frac, a, b )
         end
     end
 end
 
 function ColorAlpha( c, a )
-	return Color( c.r, c.g, c.b, a )
+	return CreateColor( c.r, c.g, c.b, a )
 end
 
 COLOR.SetAlpha = ColorAlpha
@@ -102,6 +102,10 @@ function COLOR:ToHEX()
 	return string.format( "#%02X%02X%02X", self.r, self.g, self.b )
 end
 
+function COLOR:Copy()
+	return CreateColor( self.r, self.g, self.b, self.a )
+end
+
 function COLOR:Unpack()
 	return self.r, self.g, self.b, self.a
 end
@@ -111,4 +115,50 @@ function COLOR:SetUnpacked( r, g, b, a )
 	self.g = g or 255
 	self.b = b or 255
 	self.a = a or 255
+    return self
+end
+
+function COLOR:Invert()
+    return CreateColor( 255 - self.r or 0, 255 - self.g or 0, 255 - self.b or 0, self.a or 255 )
+end
+
+do
+
+    local math_Clamp = math.Clamp
+
+    do
+
+        -- http://alienryderflex.com/saturation.html
+        local _r = 0.299
+        local _g = 0.587
+        local _b = 0.114
+
+        local math_sqrt = math.sqrt
+        function COLOR:Saturation( amt )
+            local r, g, b = self.r, self.g, self.b
+            local p = math_sqrt( ( r * r * _r ) + ( g * g * _g ) + ( b * b + _b ) )
+
+            return CreateColor( math_Clamp( p + (r - p) * amt, 0, 255 ), math_Clamp( p + (g - p) * amt, 0, 255 ), math_Clamp( p + (b - p) * amt, 0, 255 ), self.a )
+        end
+
+    end
+
+    -- Saturate & Desaturate
+    function COLOR:Saturate( proc )
+        return self:Saturation( 1 + proc / 100 )
+    end
+
+    function COLOR:Desaturate( proc )
+        return self:Saturation( 1 - math_Clamp( proc, 0, 100 ) / 100 )
+    end
+
+    -- Darken & Lighten
+    function COLOR:Darken( int )
+        return CreateColor( math_Clamp( self.r - int, 0, 255 ), math_Clamp( self.g - int, 0, 255 ), math_Clamp( self.b - int, 0, 255), self.a )
+    end
+
+    function COLOR:Lighten( int )
+        return CreateColor( math_Clamp( self.r + int, 0, 255 ), math_Clamp( self.g + int, 0, 255 ), math_Clamp( self.b + int, 0, 255 ), self.a )
+    end
+
 end
