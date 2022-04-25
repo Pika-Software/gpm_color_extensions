@@ -70,7 +70,7 @@ end
 
 COLOR.SetAlpha = ColorAlpha
 
-function isColor( any )
+function IsColor( any )
 	return getmetatable( any ) == COLOR
 end
 
