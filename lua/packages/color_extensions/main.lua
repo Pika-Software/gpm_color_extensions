@@ -5,7 +5,7 @@ debug.getregistry().Color = COLOR
 local function number( any, deff )
 	if ( any == nil ) then
 		return deff
-	elseif type( any ) != "number" then
+	elseif type( any ) ~= "number" then
 		return tonumber( any )
 	end
 
